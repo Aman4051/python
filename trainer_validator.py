@@ -198,29 +198,29 @@ def main(config):
             print(f"  New best model saved with IoU: {best_iou:.4f}")
 
 # Declaring folder paths for images and masks
-training_config = config("C:/Users/Armaan/Downloads/archive/Car parts dataset/File1/img",
-                         "C:/Users/Armaan/Downloads/archive/Car parts dataset/File1/ann",
-                         "C:/Users/Armaan/Downloads/archive/Car parts dataset/meta.json",
+training_config = config("archive/Car parts dataset/File1/img",
+                         "archive/Car parts dataset/File1/ann",
+                         "archive/Car parts dataset/meta.json",
                          (320, 320),
                          16,
                          1e-4,
                          'resnet50',
                          5,
                          20,
-                         'best_part_model_resnet50.pth'
+                         'MANet Model.pth'
                      )
 main(training_config)
 
 # Declaring folder paths for images and masks
-training_config = config("C:/Users/Armaan/Downloads/archive/Car damages dataset/File1/img",
-                         "C:/Users/Armaan/Downloads/archive/Car damages dataset/File1/ann",
-                         "C:/Users/Armaan/Downloads/archive/Car damages dataset/meta.json",
+training_config = config("archive/Car damages dataset/File1/img",
+                         "archive/Car damages dataset/File1/ann",
+                         "archive/Car damages dataset/meta.json",
                          (320, 320),
                          16,
                          1e-4,
                          'resnet50',
                          5,
                          20,
-                         'best_damage_model_resnet50.pth'
+                         'MANet Model1.pth'
                      )
 main(training_config)

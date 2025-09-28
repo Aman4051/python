@@ -1,0 +1,74 @@
+import gradio as gr
+from PIL import Image
+
+# Import the functions from your other file
+from predicter import (
+    load_models,
+    prepare_image,
+    get_prediction_mask,
+    calculate_final_quote,
+    COST_DATABASE
+)
+
+# ===================================================================
+# 1. LOAD MODELS ONCE AT STARTUP
+# ===================================================================
+
+print("Loading models...")
+PART_MODEL_PATH = "MANet Model.pth"
+DAMAGE_MODEL_PATH = "MANet Model1.pth"
+part_model, damage_model = load_models(PART_MODEL_PATH, DAMAGE_MODEL_PATH)
+print("Models loaded successfully.")
+
+# ===================================================================
+# 2. DEFINE THE MAIN PREDICTION FUNCTION FOR GRADIO
+# ===================================================================
+
+def get_cost_estimate(image_pil, car_model_str):
+    """
+    The main function that powers the Gradio app.
+    Takes user inputs and returns the final estimate.
+    """
+    if image_pil is None or car_model_str is None:
+        return "$0", "Please upload an image and select a model.", ""
+
+    # Prepare the image
+    image_tensor = prepare_image(image_pil)
+
+    # Get predictions from both models
+    parts_mask = get_prediction_mask(part_model, image_tensor)
+    damages_mask = get_prediction_mask(damage_model, image_tensor)
+    
+    # Calculate the final quote
+    total_cost, cost_breakdown, damage_analysis = calculate_final_quote(
+        car_model_str, parts_mask, damages_mask
+    )
+
+    return total_cost, cost_breakdown, damage_analysis
+
+# ===================================================================
+# 3. CREATE AND LAUNCH THE GRADIO INTERFACE
+# ===================================================================
+
+demo = gr.Interface(
+    fn=get_cost_estimate,
+    inputs=[
+        gr.Image(type="pil", label="Upload Car Image"),
+        gr.Dropdown(list(COST_DATABASE.keys()), label="Select Car Model")
+    ],
+    outputs=[
+        gr.Textbox(label="Total Estimated Cost"),
+        gr.Textbox(label="Cost Breakdown"),
+        gr.Textbox(label="Damage Analysis")
+    ],
+    title="Car Damage Repair Cost Estimator",
+    description="Upload an image of a damaged car and select the model to get a repair cost estimate.",
+    allow_flagging="never",
+    examples=[
+        ["examples/sample_car1.jpg", "Toyota Camry"],
+        ["examples/sample_car2.jpg", "BMW X5"]
+    ]
+)
+
+if __name__ == "__main__":
+    demo.launch()
